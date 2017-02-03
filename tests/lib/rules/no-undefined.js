@@ -13,17 +13,19 @@ const rule = require("../../../lib/rules/no-undefined"),
     RuleTester = require("../../../lib/testers/rule-tester");
 
 //------------------------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------------------------
+
+const ES6_SCRIPT = { ecmaVersion: 6 };
+const ES6_MODULE = { ecmaVersion: 6, sourceType: "module" };
+
+//------------------------------------------------------------------------------
 // Tests
 //------------------------------------------------------------------------------
 
 const errors = [{ message: "Unexpected use of undefined.", type: "Identifier" }];
 
-const ruleTester = new RuleTester({
-    parserOptions: {
-        ecmaVersion: 6,
-        sourceType: "module"
-    }
-});
+const ruleTester = new RuleTester({ parserOptions: ES6_SCRIPT });
 
 ruleTester.run("no-undefined", rule, {
     valid: [
@@ -44,10 +46,10 @@ ruleTester.run("no-undefined", rule, {
         "({ undefined() {} })",
         "class Foo { undefined() {} }",
         "(class { undefined() {} })",
-        "import { undefined as a } from 'foo'",
-        "export { undefined } from 'foo'",
-        "export { undefined as a } from 'foo'",
-        "export { a as undefined } from 'foo'"
+        { code: "import { undefined as a } from 'foo'", parserOptions: ES6_MODULE },
+        { code: "export { undefined } from 'foo'", parserOptions: ES6_MODULE },
+        { code: "export { undefined as a } from 'foo'", parserOptions: ES6_MODULE },
+        { code: "export { a as undefined } from 'foo'", parserOptions: ES6_MODULE }
     ],
     invalid: [
         { code: "undefined", errors },
@@ -88,11 +90,31 @@ ruleTester.run("no-undefined", rule, {
                 column: 23
             }]
         },
-        { code: "import undefined from 'foo'", errors },
-        { code: "import * as undefined from 'foo'", errors },
-        { code: "import { undefined } from 'foo'", errors },
-        { code: "import { a as undefined } from 'foo'", errors },
-        { code: "export { undefined }", errors },
+        {
+            code: "import undefined from 'foo'",
+            parserOptions: ES6_MODULE,
+            errors
+        },
+        {
+            code: "import * as undefined from 'foo'",
+            parserOptions: ES6_MODULE,
+            errors
+        },
+        {
+            code: "import { undefined } from 'foo'",
+            parserOptions: ES6_MODULE,
+            errors
+        },
+        {
+            code: "import { a as undefined } from 'foo'",
+            parserOptions: ES6_MODULE,
+            errors
+        },
+        {
+            code: "export { undefined }",
+            parserOptions: ES6_MODULE,
+            errors
+        },
         { code: "let a = [b, ...undefined]", errors },
         { code: "[a, ...undefined] = b", errors },
         { code: "[a = undefined] = b", errors }
