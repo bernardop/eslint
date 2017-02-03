@@ -18,7 +18,12 @@ const rule = require("../../../lib/rules/no-undefined"),
 
 const errors = [{ message: "Unexpected use of undefined.", type: "Identifier" }];
 
-const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 6 } });
+const ruleTester = new RuleTester({
+    parserOptions: {
+        ecmaVersion: 6,
+        sourceType: "module"
+    }
+});
 
 ruleTester.run("no-undefined", rule, {
     valid: [
@@ -38,7 +43,11 @@ ruleTester.run("no-undefined", rule, {
         "({ undefined: bar } = foo)",
         "({ undefined() {} })",
         "class Foo { undefined() {} }",
-        "(class { undefined() {} })"
+        "(class { undefined() {} })",
+        "import { undefined as a } from 'foo'",
+        "export { undefined } from 'foo'",
+        "export { undefined as a } from 'foo'",
+        "export { a as undefined } from 'foo'"
     ],
     invalid: [
         { code: "undefined", errors },
@@ -79,5 +88,13 @@ ruleTester.run("no-undefined", rule, {
                 column: 23
             }]
         },
+        { code: "import undefined from 'foo'", errors },
+        { code: "import * as undefined from 'foo'", errors },
+        { code: "import { undefined } from 'foo'", errors },
+        { code: "import { a as undefined } from 'foo'", errors },
+        { code: "export { undefined }", errors },
+        { code: "let a = [b, ...undefined]", errors },
+        { code: "[a, ...undefined] = b", errors },
+        { code: "[a = undefined] = b", errors }
     ]
 });
