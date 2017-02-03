@@ -68,6 +68,16 @@ ruleTester.run("no-undefined", rule, {
         },
         { code: "({ foo: function undefined() {} })", errors },
         { code: "class Foo { [undefined]() {} }", errors },
-        { code: "(class { [undefined]() {} })", errors }
+        { code: "(class { [undefined]() {} })", errors },
+        {
+            code: "var undefined = true; undefined = false;",
+            errors: [{
+                message: "Unexpected use of undefined.",
+                column: 5
+            }, {
+                message: "Unexpected use of undefined.",
+                column: 23
+            }]
+        },
     ]
 });
